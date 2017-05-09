@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 商品相关的所有试图 zhaoyongping-->
+<mapper namespace="com.zgxcw.service.infrastructure.goods.dao.GoodsAllViewMapper">
+
+   
+    <resultMap id="GoodsPicMap" type="com.zgxcw.service.infrastructure.goods.dto.response.GoodsSkuPictureBeanDto">
+         <result column="skupicid" property="skuPicID" jdbcType="VARCHAR" />
+         <result column="picturefile" property="pictureFile" jdbcType="VARCHAR" />
+         <result column="resolutioncode" property="resolutionCode" jdbcType="VARCHAR" />
+         <result column="snapshotno" property="snapshotNO" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<sql id="selectPicture">
+		select 
+		  gsp1.skupicid, <!--SKU图片标识-->
+		  gsp1.picturefile, <!--图片文件地址-->
+		  gsp1.snapshotno
+		  from goods.T_GOODS_SKUPICTURE gsp1
+		  inner join 
+		  (select 
+		      gsp2.goodsskuid, 
+		      max(gsp2.snapshotno) snapshotno 
+		      from goods.t_goods_skupicture gsp2             
+		      group by gsp2.goodsskuid
+		   ) sku_max_list <!--取出快照号最大的sku图片-->
+		   on gsp1.goodsskuid = sku_max_list.goodsskuid 
+		   and gsp1.snapshotno = sku_max_list.snapshotno
+		   where gsp1.mainpictureid is null
+		   and exists
+ 		   (select 1
+           from t_goods_skupicture tp
+           where tp.goodsskuid = gsp1.goodsskuid
+           and tp.snapshotno = gsp1.snapshotno
+           and (<![CDATA[tp.resolutioncode <> '001']]>)
+           and tp.picturefile is null) 
+		   order by gsp1.skupicid,
+		            gsp1.picturefile
+	</sql>
+	
+	<select id="getCount" resultType="java.lang.Long">
+		select count(1)
+		  from goods.T_GOODS_SKUPICTURE gsp1
+		  inner join 
+		  (select 
+		      gsp2.goodsskuid, 
+		      max(gsp2.snapshotno) snapshotno 
+		      from goods.t_goods_skupicture gsp2             
+		      group by gsp2.goodsskuid
+		   ) sku_max_list <!--取出快照号最大的sku图片-->
+		   on gsp1.goodsskuid = sku_max_list.goodsskuid 
+		   and gsp1.snapshotno = sku_max_list.snapshotno
+		   where gsp1.mainpictureid is null
+		   and exists
+ 		   (select 1
+           from t_goods_skupicture tp
+           where tp.goodsskuid = gsp1.goodsskuid
+           and tp.snapshotno = gsp1.snapshotno
+           and (<![CDATA[tp.resolutioncode <> '001']]>)
+           and tp.picturefile is null) 
+		   order by gsp1.skupicid,
+		            gsp1.picturefile
+	</select>
+	<!-- 获取所有商品图片的主图(用于修改图片水印) -->
+	<select id="getAllMainPic" resultMap="GoodsPicMap" parameterType="java.util.Map">
+		SELECT *
+  			FROM (SELECT R.*, ROWNUM RN
+          		FROM (SELECT * FROM ( <include refid = "selectPicture" />)) R
+         	WHERE <![CDATA[#{max} >= ROWNUM ]]>)
+ 		WHERE <![CDATA[RN > #{min}]]>
+	</select>
+	<!-- 通过主图ID获取各种像素的图片(用于修改图片水印) -->
+	<select id="getAllPicByMainId" resultMap="GoodsPicMap" parameterType="java.util.Map">
+		select t.skupicid,
+		       t.resolutioncode,
+		       t.snapshotno 
+		   from T_GOODS_SKUPICTURE t
+		   where t.mainpictureid= #{mainPictureID}
+		   <!-- 只修复没有图片的数据 -->
+		   and t.picturefile is null
+		   order by t.resolutioncode
+	</select>
+	<update id="updateSkuPic" parameterType="java.util.Map">
+		update T_GOODS_SKUPICTURE
+	    <set >
+	      <if test="pictureFile != null" >
+	        PICTUREFILE = #{pictureFile,jdbcType=VARCHAR},
+	      </if>
+	      <if test="updateTime != null" >
+	        UPDATETIME = #{updateTime,jdbcType=DECIMAL},
+	      </if>
+	      <if test="updateUser != null" >
+	        UPDATEUSER = #{updateUser,jdbcType=VARCHAR},
+	      </if>
+	    </set>
+	    where SKUPICID = #{skuPicID,jdbcType=VARCHAR}
+	</update>
+</mapper>

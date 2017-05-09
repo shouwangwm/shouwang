@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zgxcw.service.infrastructure.goods.dao.SkuCarModelMappingMapper" >
+    <resultMap id="BaseResultMap" type="com.zgxcw.service.infrastructure.goods.bean.SkuCarModelMapping" >
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <result column="carMasterBrandId" property="carMasterBrandId" jdbcType="VARCHAR" />
+        <result column="carSubBrandId" property="carSubBrandId" jdbcType="VARCHAR" />
+<!--         <result column="carSeriesId" property="carSeriesId" jdbcType="VARCHAR" /> -->
+        <result column="carModelId" property="carModelId" jdbcType="VARCHAR" />
+        <result column="commonType" property="commonType" jdbcType="VARCHAR" />
+        <result column="createTime" property="createTime" jdbcType="DECIMAL" />
+        <result column="CREATEUSER" property="creatorId" jdbcType="VARCHAR" />
+        <result column="goodsskuid" property="skuId" jdbcType="VARCHAR" />
+        <result column="snapshotNo" property="snapshotNo" jdbcType="DECIMAL" />
+        <result column="deletionStatus" property="deletionStatus" jdbcType="DECIMAL" />
+        <result column="carType" property="cartype" jdbcType="VARCHAR" />
+        <result column="attr1" property="attr1" jdbcType="VARCHAR" />
+		<result column="attr2" property="attr2" jdbcType="VARCHAR" />
+    </resultMap>
+	<sql id="tableName">T_GOODS_SPPORTCAR</sql>
+	
+    <insert id="insert" parameterType="com.zgxcw.service.infrastructure.goods.bean.SkuCarModelMapping" >
+        insert into <include refid="tableName" /> (id, carMasterBrandId, carSubBrandId,
+        carModelId, carstyleid, commonType,
+        createTime, createUser, goodsskuid, snapshotNo, cartype,
+        attr1, attr2)
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+        	#{id,jdbcType=VARCHAR}, #{carMasterBrandId,jdbcType=VARCHAR}, #{carSubBrandId,jdbcType=VARCHAR}, 
+            #{carModelId,jdbcType=VARCHAR}, #{commonType,jdbcType=VARCHAR}, 
+            #{createTime,jdbcType=DECIMAL}, #{creatorId,jdbcType=VARCHAR}, #{skuId,jdbcType=VARCHAR},
+            #{snapshotNo,jdbcType=DECIMAL}, #{carType,jdbcType=VARCHAR},
+            #{attr1,jdbcType=VARCHAR}, #{attr2,jdbcType=VARCHAR}
+        </trim>    
+    </insert>
+
+    <!-- 批量添加 -->
+    <select id="insertForBatch" parameterType="java.util.List">
+        insert into <include refid="tableName" /> (id, carMasterBrandId, carSubBrandId,
+        carModelId, commonType,
+        createTime, createUser, goodsskuid, snapshotNo, cartype,
+        attr1, attr2)
+        <foreach collection="list" item="item" separator="union all">
+            SELECT
+            #{item.id,jdbcType=VARCHAR}, #{item.carMasterBrandId,jdbcType=VARCHAR}, #{item.carSubBrandId,jdbcType=VARCHAR},
+            #{item.carModelId,jdbcType=VARCHAR}, #{item.commonType,jdbcType=VARCHAR},
+            #{item.createTime,jdbcType=DECIMAL}, #{item.creatorId,jdbcType=VARCHAR}, #{item.skuId,jdbcType=VARCHAR},
+            #{item.snapshotNo,jdbcType=DECIMAL}, #{item.carType,jdbcType=VARCHAR},
+            #{item.attr1,jdbcType=VARCHAR}, #{item.attr2,jdbcType=VARCHAR}
+            FROM DUAL
+        </foreach>
+    </select>
+
+
+</mapper>

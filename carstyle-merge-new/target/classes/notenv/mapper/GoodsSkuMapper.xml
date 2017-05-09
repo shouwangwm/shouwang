@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zgxcw.service.infrastructure.goods.dao.GoodsSkuMapper">
+	<!--表名 -->
+	<sql id="tableName">T_GOODS_SKU</sql>
+	<resultMap id="BaseResultMap" type="GoodsSku">
+		<id column="GOODSSKUID" property="goodsSkuID" jdbcType="VARCHAR" />
+		<id column="SNAPSHOTNO" property="snapshotNO" jdbcType="DECIMAL" />
+		<result column="GOODSID" property="goodsID" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectForList" resultMap="BaseResultMap"
+		parameterType="GoodsSku">
+		select
+		GOODSSKUID, SNAPSHOTNO,GOODSID
+		from
+		T_GOODS_SKU
+<!-- 		where GOODSSKUID = '69AE6C1527D83636455A2FB4CF9A7144' -->
+<!--    			  AND SNAPSHOTNO = 1 -->
+	</select>
+</mapper>

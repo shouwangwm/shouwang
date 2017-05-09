@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zgxcw.service.infrastructure.goods.dao.GoodsCarStyleLargeMapper" >
+	<resultMap id="BaseResultMap" type="com.zgxcw.service.infrastructure.goods.bean.CarModel">
+		<id column="MASTERBRANDID" property="masterBrandId" jdbcType="VARCHAR" />
+		<id column="BRANDID" property="brandId" jdbcType="VARCHAR" />
+		<id column="MODELID" property="modelId" jdbcType="VARCHAR" />
+		<id column="CARSTYLEID" property="carstyleId" jdbcType="VARCHAR" />
+		<id column="commonType" property="commonType" jdbcType="VARCHAR" />
+		<id column="attr1" property="attr1" jdbcType="VARCHAR" />
+		<id column="attr2" property="attr2" jdbcType="VARCHAR" />
+	</resultMap>
+	
+
+    <sql id="Base_Column_List" >
+        CARSTYLEID, GOODSID, GOODSSKUID, SNAPSHOTNO, BIGCARTYPEID, BIGMASTERBRANDID, BIGCARMODELID, 
+        HOURSEPOWERVAL, DRIVERVAL, DELETIONSTATUS, CREATETIME, CREATEUSER, UPDATETIME, UPDATEUSER, 
+        FIRSTSPELL, ALLSELECTTYPE
+    </sql>
+
+	<!-- 根据条件查询列表 -->
+	<select id="selectForList" resultMap="BaseResultMap" parameterType="com.zgxcw.service.infrastructure.goods.bean.GoodsCarStyleLarge">
+		select distinct b.carmasterbrandid as MASTERBRANDID,
+			   gc.bigcartypeid       as BRANDID,
+			   gc.bigcarmodelid   as MODELID,
+			   gc.hoursepowerval||'-'||gc.driverval  as CARSTYLEID,
+			   gc.allselecttype   as commonType
+		  from t_goods_carstyle_large gc
+		  left join cms.t_cms_carstyle c on gc.bigcarmodelid = c.carmodelid
+										and c.driverval = gc.driverval
+										AND c.horsepowerval = gc.hoursepowerval
+		  left join cms.t_cms_carmasterbrand b on gc.bigmasterbrandid = b.carmasterbrandid
+		 where GOODSSKUID = #{goodsSkuID}
+		   AND SNAPSHOTNO = #{snapshotNO}
+	</select>
+
+</mapper>

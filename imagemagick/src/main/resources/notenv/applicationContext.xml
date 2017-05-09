@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+	
+	<!--对web包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 -->
+	<context:component-scan base-package="com.zgxcw.service.infrastructure.goods" />
+		
+	<!--配置文件占位符 -->
+	<bean id="configProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:env/tfs.properties</value>
+				<value>classpath:env/dao.properties</value>
+				<value>classpath:env/imagePath.properties</value>
+			</list>
+		</property>
+		<property name="fileEncoding" value="utf-8" />
+	</bean>
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+        <property name="properties" ref="configProperties" />
+    </bean>
+	
+	<!--数据连接池 -->
+	<bean id="writeDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.write.driverClassName}" />
+		<property name="url" value="${jdbc.write.url}" />
+		<property name="username" value="${jdbc.write.username}" />
+		<property name="password" value="${jdbc.write.password}" />
+		<property name="maxActive" value="${jdbc.write.maxActive}"></property>
+	     <property name="initialSize" value="${jdbc.write.initialSize}"></property>
+	     <property name="maxWait" value="${jdbc.write.maxWait}"></property>
+	     <property name="minIdle" value="${jdbc.write.minIdle}"></property>
+	
+	     <property name="timeBetweenEvictionRunsMillis" value="${jdbc.write.timeBetweenEvictionRunsMillis}"></property>
+	     <property name="minEvictableIdleTimeMillis" value="${jdbc.write.minEvictableIdleTimeMillis}"></property>
+	
+	     <property name="validationQuery" value="${jdbc.write.validationQuery}"></property>
+	     <property name="testWhileIdle" value="${jdbc.write.testWhileIdle}"></property>
+	     <property name="testOnBorrow" value="${jdbc.write.testOnBorrow}"></property>
+	     <property name="testOnReturn" value="${jdbc.write.testOnReturn}"></property>
+	
+	     <property name="poolPreparedStatements" value="${jdbc.write.poolPreparedStatements}"></property>
+	     <property name="maxOpenPreparedStatements" value="${jdbc.write.maxOpenPreparedStatements}"></property>
+	</bean>
+	
+	<bean id="readDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.read.driverClassName}" />
+		<property name="url" value="${jdbc.read.url}" />
+		<property name="username" value="${jdbc.read.username}" />
+		<property name="password" value="${jdbc.read.password}" />
+		<property name="maxActive" value="${jdbc.read.maxActive}"></property>
+	     <property name="initialSize" value="${jdbc.read.initialSize}"></property>
+	     <property name="maxWait" value="${jdbc.read.maxWait}"></property>
+	     <property name="minIdle" value="${jdbc.read.minIdle}"></property>
+	
+	     <property name="timeBetweenEvictionRunsMillis" value="${jdbc.read.timeBetweenEvictionRunsMillis}"></property>
+	     <property name="minEvictableIdleTimeMillis" value="${jdbc.read.minEvictableIdleTimeMillis}"></property>
+	
+	     <property name="validationQuery" value="${jdbc.read.validationQuery}"></property>
+	     <property name="testWhileIdle" value="${jdbc.read.testWhileIdle}"></property>
+	     <property name="testOnBorrow" value="${jdbc.read.testOnBorrow}"></property>
+	     <property name="testOnReturn" value="${jdbc.read.testOnReturn}"></property>
+	
+	     <property name="poolPreparedStatements" value="${jdbc.read.poolPreparedStatements}"></property>
+	     <property name="maxOpenPreparedStatements" value="${jdbc.read.maxOpenPreparedStatements}"></property>
+	</bean>
+	<!-- 动态数据源配置 -->
+	<bean id="dynamicDataSource" class="com.zgxcw.framework.interceptor.dynamicdatasource.DynamicDataSource">   
+        <property name="targetDataSources">   
+            <map>   
+                <entry key="writeDataSource" value-ref="writeDataSource"/>   
+                <entry key="readDataSource" value-ref="readDataSource"/>   
+            </map>   
+        </property>   
+        <property name="defaultTargetDataSource" ref="readDataSource"/>   
+    </bean> 
+    
+	<!--事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dynamicDataSource" />
+	</bean>
+	<!--事务拦截器 -->
+	<bean id="dynamicTransactionInterceptor"
+		class="com.zgxcw.framework.interceptor.DynamicTransactionInterceptor">
+		<property name="transactionManager" ref="transactionManager" />
+		<!--writeOnly方法前缀配置 -->
+		<property name="writeMthods">
+			<list>
+				<value>create</value>
+				<value>remove</value>
+				<value>modify</value>
+				<value>insert</value>
+				<value>delete</value>
+				<value>update</value>
+			</list>
+		</property>
+		
+		<property name="transactionAttributes">
+			<props>
+				<!-- 拦截器需要拦截的所有方法 -->
+				<prop key="find*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="query*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="select*">PROPAGATION_REQUIRED,-readOnly</prop>
+				
+				<prop key="create*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="modify*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,-Exception</prop>
+			</props>
+		</property>
+	</bean>	
+	<!-- 用来定义哪些类需要事务管理 spring事务动态代理类 BeanNameAutoProxyCreator 根据类名自动代理，接受表达式 -->
+	<bean id="beanProxy"
+		class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<value>*Mapper</value>
+		</property>
+		<property name="interceptorNames">
+			<value>dynamicTransactionInterceptor</value>
+		</property>
+	</bean>
+<!-- 	动态数据源配置结束 -->
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dynamicDataSource" />
+		<property name="configLocation" value="classpath:notenv/mybatis-config.xml" />
+	</bean>
+	
+	<!-- TFS连接池 start -->
+	<bean id="defaultTfsManager" class="com.taobao.common.tfs.DefaultTfsManager" init-method="init" >  
+     <!--  整个进程中系统最多等待多少个请求,取决于你有多少个线程并发的请求TFS  -->
+       <property name="maxWaitThread" value="${tfs.maxWaitThread}"/>  
+       
+      <!-- 单个请求最大的等待时间(ms) 超过这个时间放弃这次请求  -->
+      <property name="timeout" value="${tfs.timeout}"/>  
+       
+      <!-- Tfs master nameserver ip address  -->
+      <property name="nsip" value="${tfs.nsip}"/>  
+       
+      <!-- TFS 集群的编号,这个编号只是一种参考,系统初始化的时候会从ns上取,取不到才用本地设置的.!  -->
+      <property name="tfsClusterIndex" value="${tfs.tfsClusterIndex}"/>  
+       
+      <!-- TFS在读取文件的时候会缓存block所在的数据服务器ip,这个参数配置了最多缓存的记录个数!  -->
+      <property name="maxCacheItemCount" value="${tfs.maxCacheItemCount}"/>  
+       
+     <!--  上一项缓存最大有效的时间(ms)!  -->
+      <property name="maxCacheTime" value="${tfs.maxCacheTime}"/>  
+       
+    </bean>  
+	<!-- TFS连接池 end -->
+    
+    <bean id="goodsAllViewMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"
+		  autowire="byType">
+		<property name="mapperInterface"
+				  value="com.zgxcw.service.infrastructure.goods.dao.GoodsAllViewMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="imageAction" class="com.zgxcw.service.infrastructure.goods.action.impl.ImageActionImpl"
+		  autowire="byType">
+		<property name="goodsAllViewMapper" ref="goodsAllViewMapper" />
+	</bean>
+	<bean id="beanFactoryUtils" class="com.zgxcw.service.infrastructure.goods.utils.SpringBeanFactoryUtils" />
+	
+</beans>

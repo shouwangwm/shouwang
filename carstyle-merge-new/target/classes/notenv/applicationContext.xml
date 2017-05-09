@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans.xsd  
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+	
+	<!--对web包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 -->
+	<context:component-scan base-package="com.zgxcw.service.infrastructure.goods" />
+
+    <import resource="classpath:env/property_configurer.xml" />
+	
+	<!--数据连接池 -->
+	<bean id="readDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.read.driverClassName}" />
+		<property name="url" value="${jdbc.read.url}" />
+		<property name="username" value="${jdbc.read.username}" />
+		<property name="password" value="${jdbc.read.password}" />
+		<property name="maxActive" value="${jdbc.read.maxActive}"></property>
+	     <property name="initialSize" value="${jdbc.read.initialSize}"></property>
+	     <property name="maxWait" value="${jdbc.read.maxWait}"></property>
+	     <property name="minIdle" value="${jdbc.read.minIdle}"></property>
+	
+	     <property name="timeBetweenEvictionRunsMillis" value="${jdbc.read.timeBetweenEvictionRunsMillis}"></property>
+	     <property name="minEvictableIdleTimeMillis" value="${jdbc.read.minEvictableIdleTimeMillis}"></property>
+	
+	     <property name="validationQuery" value="${jdbc.read.validationQuery}"></property>
+	     <property name="testWhileIdle" value="${jdbc.read.testWhileIdle}"></property>
+	     <property name="testOnBorrow" value="${jdbc.read.testOnBorrow}"></property>
+	     <property name="testOnReturn" value="${jdbc.read.testOnReturn}"></property>
+	
+	     <property name="poolPreparedStatements" value="${jdbc.read.poolPreparedStatements}"></property>
+	     <property name="maxOpenPreparedStatements" value="${jdbc.read.maxOpenPreparedStatements}"></property>
+	</bean>
+<!-- 	动态数据源配置结束 -->
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="readDataSource" />
+		<property name="configLocation" value="classpath:notenv/mybatis-config.xml" />
+		<property name="typeAliasesPackage" value="com.zgxcw.service.infrastructure.goods.bean"></property>
+		<!--mybatis分页插件 -->
+		<property name="plugins">
+			<array>
+				<bean class="com.github.pagehelper.PageHelper">
+					<property name="properties">
+						<value>
+							dialect=oracle
+							reasonable=true
+							pageSizeZero=true
+						</value>
+					</property>
+				</bean>
+			</array>
+		</property>
+	</bean>
+
+	<bean id="carStyleMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"
+		  autowire="byType">
+		<property name="mapperInterface"
+				  value="com.zgxcw.service.infrastructure.goods.dao.CarStyleMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean id="goodsCarStyleLargeMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"
+		  autowire="byType">
+		<property name="mapperInterface"
+				  value="com.zgxcw.service.infrastructure.goods.dao.GoodsCarStyleLargeMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<bean id="goodsCarStyleMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"
+		  autowire="byType">
+		<property name="mapperInterface"
+				  value="com.zgxcw.service.infrastructure.goods.dao.GoodsCarStyleMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean id="goodsSkuMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"
+		  autowire="byType">
+		<property name="mapperInterface"
+				  value="com.zgxcw.service.infrastructure.goods.dao.GoodsSkuMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+	<bean id="skuCarModelMappingMapper" class="org.mybatis.spring.mapper.MapperFactoryBean"
+		  autowire="byType">
+		<property name="mapperInterface"
+				  value="com.zgxcw.service.infrastructure.goods.dao.SkuCarModelMappingMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+</beans>

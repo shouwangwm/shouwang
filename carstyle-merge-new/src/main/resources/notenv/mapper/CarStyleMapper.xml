@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 商品支持的车型 -->
+<mapper namespace="com.zgxcw.service.infrastructure.goods.dao.CarStyleMapper">
+
+	<resultMap id="CarModelMap" type="com.zgxcw.service.infrastructure.goods.bean.CarModel">
+		<id column="CARSTYLEID" property="carstyleId" jdbcType="VARCHAR" />
+		<id column="MODELID" property="modelId" jdbcType="VARCHAR" />
+		<id column="MASTERBRANDID" property="masterBrandId" jdbcType="VARCHAR" />
+		<id column="BRANDID" property="brandId" jdbcType="VARCHAR" />
+<!-- 		<id column="attr1" property="attr1" jdbcType="VARCHAR" /> -->
+<!-- 		<id column="attr2" property="attr2" jdbcType="VARCHAR" /> -->
+	</resultMap>
+
+
+	<select id="selectCarStyle" resultMap="CarModelMap">
+	select distinct b.carmasterbrandid as masterbrandid,
+	   case when b.issmallcar = 1 then
+	       b.carbrandid
+	   else
+	       m.bigcartypeid  
+	   end as brandid,
+		   m.carmodelid as modelid,
+       case when b.issmallcar = 1 then
+           s.engine||'-'||s.yeartype
+       else
+           s.horsepowerval||'-'||s.driverval
+         end as CARSTYLEID
+	  from cms.t_cms_carbrand b, cms.t_cms_carmodel m, cms.t_cms_carstyle s
+	 where b.carbrandid = m.carbrandid
+	   and s.carmodelid = m.carmodelid
+	</select>
+
+</mapper>

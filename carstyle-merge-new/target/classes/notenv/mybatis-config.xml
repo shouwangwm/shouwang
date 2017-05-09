@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!-- Continue going here -->
+	<mappers>
+		<mapper resource="notenv/mapper/CarStyleMapper.xml" />
+		<mapper resource="notenv/mapper/GoodsCarStyleLargeMapper.xml" />
+		<mapper resource="notenv/mapper/GoodsCarStyleMapper.xml" />
+		<mapper resource="notenv/mapper/GoodsSkuMapper.xml" />
+		<mapper resource="notenv/mapper/SkuCarModelMappingMapper.xml" />
+		<!--<package name="com.zgxcw.service.infrastructure.goods.dao"/>-->
+	</mappers>
+
+
+</configuration>

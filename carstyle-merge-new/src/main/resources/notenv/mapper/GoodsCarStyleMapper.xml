@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 商品支持的车型 -->
+<mapper namespace="com.zgxcw.service.infrastructure.goods.dao.GoodsCarStyleMapper">
+
+	<resultMap id="BaseResultMap" type="com.zgxcw.service.infrastructure.goods.bean.CarModel">
+		<id column="MASTERBRANDID" property="masterBrandId" jdbcType="VARCHAR" />
+		<id column="BRANDID" property="brandId" jdbcType="VARCHAR" />
+		<id column="MODELID" property="modelId" jdbcType="VARCHAR" />
+		<id column="CARSTYLEID" property="carstyleId" jdbcType="VARCHAR" />
+		<id column="attr1" property="attr1" jdbcType="VARCHAR" />
+		<id column="attr2" property="attr2" jdbcType="VARCHAR" />
+	</resultMap>
+	
+
+	<sql id="Base_Column_List">
+		CARSTYLEID, GOODSID,GOODSSKUID,SNAPSHOTNO, CARMODELID, CARBRANDID, CARMASTERBRANDID, STYLEYEAR,
+		DELETIONSTATUS, CREATETIME, CREATEUSER, UPDATETIME, UPDATEUSER, DISPLACEMENT
+	</sql>
+
+
+	<!-- 根据条件查询列表 -->
+	<select id="selectForList" resultMap="BaseResultMap" parameterType="com.zgxcw.service.infrastructure.goods.bean.GoodsCarStyle">
+		select distinct gc.carmasterbrandid as MASTERBRANDID,
+			   gc.carbrandid       as BRANDID,
+			   gc.carmodelid       as MODELID,
+			   gc.displacement||'-'||gc.styleyear as CARSTYLEID
+		  from (select * from t_goods_carstyle gcc where gcc.GOODSSKUID = #{goodsSkuID}
+		AND gcc.SNAPSHOTNO = #{snapshotNO} and gcc.displacement between '0' and '99')gc,
+		 cms.t_cms_carstyle c
+		 where gc.carmodelid = c.carmodelid
+	</select>
+
+	<select id="queryBusinessAttr" parameterType="String" resultType="String">
+		select BUSINESSATTRID from T_GOODS_BUSINESSATTR where GOODSSKUID = #{ID} AND ATTRCODE='003'
+	</select>
+	
+</mapper>
