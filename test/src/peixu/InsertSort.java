@@ -4,10 +4,9 @@ public class InsertSort {
 
 	public static void main(String[] args) {
 		int[] a = { 11, 3, 4, 22, 52, 55, 3, 8, 7, 9 };
+		
 		insertSort(a);
-		for (int i : a) {
-			System.out.print(i + " ");
-		}
+		insertSort2(a);
 	}
 
 	/**
@@ -32,6 +31,36 @@ public class InsertSort {
 			}
 			
 			numbers[j] = temp;
+		}
+		
+		System.out.println("insertSort后：");
+		for(int i : numbers){
+			System.out.print(i + " ");
+		}
+		
+		System.out.println("");
+	}
+	
+	/**
+	 * @author weiming
+	 * @date   2017年2月15日
+	 * @param arr
+	 */
+	public static void insertSort2(int[] arr){
+		int temp = 0;
+		int j = 0;
+		int size = arr.length;
+		for(int i=0;i < size;i++){
+			temp = arr[i];
+			for(j = i;j > 0 && temp < arr[j - 1];j--){
+				arr[j] = arr[j - 1];
+			}
+			arr[j] = temp;
+		}
+		
+		System.out.println("insertSort2后：");
+		for(int i : arr){
+			System.out.print(i + " ");
 		}
 	}
 }

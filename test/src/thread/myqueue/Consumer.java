@@ -15,7 +15,7 @@ public class Consumer extends Thread {
 			try {
 				str = Storage.goodsQueue.take();
 				System.out.println("消费了" + str  + " 仓库容量： " + Storage.goodsQueue.size());
-				Consumer.sleep(200);
+//				Consumer.sleep(10);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

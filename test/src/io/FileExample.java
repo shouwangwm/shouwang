@@ -12,7 +12,7 @@ public class FileExample{
   * 文件处理示例 
   */  
  public static void createFile() {  
-    File f=new File("D:/111.txt");  
+    File f=new File("conf/111.txt");  
        try{  
            f.createNewFile();  //当且仅当不存在具有此抽象路径名指定名称的文件时，不可分地创建一个新的空文件。  
            System.out.println("该分区大小"+f.getTotalSpace()/(1024*1024*1024)+"G"); //返回由此抽象路径名表示的文件或目录的名称。  

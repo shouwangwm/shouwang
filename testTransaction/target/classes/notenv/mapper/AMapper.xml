@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 商品支持的车型 -->
+<mapper namespace="com.zgxcw.service.infrastructure.goods.dao.AMapper">
+
+	<resultMap id="BaseMap" type="com.zgxcw.service.infrastructure.goods.bean.A">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<id column="name" property="name" jdbcType="VARCHAR" />
+		<id column="scount" property="scount" jdbcType="INTEGER" />
+	</resultMap>
+
+
+	<insert id="insert" parameterType="A">
+		insert into AAA (id,name,scount) values (#{id},#{name},#{scount})
+	</insert>
+	
+	<select id="select" parameterType="A">
+		select * from AAA
+		<where>
+			<if test="id != null">
+				and id = #{id}
+			</if>
+		</where>
+	</select>
+</mapper>

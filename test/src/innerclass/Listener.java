@@ -5,22 +5,19 @@ package innerclass;
  *
  */
 public class Listener {
-	
-	public Listener(Person p) {
-		p.test();
-	}
-	
+		
 	public static void main(String[] args) {
-		Listener listener = new Listener(new Person(){
+		Person p = new Person(){
 			@Override
 			public void test() {
 				System.out.println("我是匿名生成的");
 			}
-		});
+		};
+		p.test();
+		
 	}
 }
 
 interface Person{
-	
 	public void test();
 }

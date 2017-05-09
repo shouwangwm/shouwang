@@ -16,7 +16,7 @@ public class LockMethod {
 		Lock lock = new ReentrantLock();
 		lock.lock();
 		try {
-			System.out.println("testA sleep 2000 ...");
+			System.out.println(Thread.currentThread().getName() + " testA sleep 2000 ...");
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -29,7 +29,7 @@ public class LockMethod {
 		Lock lock = new ReentrantLock();
 		lock.lock();
 		try {
-			System.out.println("testB sleep 2000 ...");
+			System.out.println(Thread.currentThread().getName() + " testB sleep 2000 ...");
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

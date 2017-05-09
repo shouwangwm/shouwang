@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:flex="http://www.springframework.org/schema/flex" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+    http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+      http://www.springframework.org/schema/flex http://www.springframework.org/schema/flex/spring-flex-1.0.xsd">
+
+	<!--对web包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 -->
+	<context:component-scan base-package="com.test.service" />
+
+	<!--配置文件占位符 -->
+	<import resource="classpath:env/property_configurer.xml" />
+
+
+	<!-- 真正可以产生Connection的ConnectionFactory，由对应的 JMS服务厂商提供 -->
+	<bean id="consumerFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="failover:(tcp://172.31.25.38:61616)" />
+	</bean>
+
+	<!--这个是队列目的地，点对点的 -->
+	<bean id="queueDestination" class="org.apache.activemq.command.ActiveMQQueue">
+		<constructor-arg>
+			<value>one2one</value>
+		</constructor-arg>
+	</bean>
+	
+	<!--这个是主题目的地，一对多的 -->
+	<bean id="topicDestination" class="org.apache.activemq.command.ActiveMQTopic">
+		<constructor-arg value="topic1" />
+	</bean>
+
+	<!-- 消息监听器 -->
+	<bean id="topicMessageListener"
+		class="com.test.service.springdemo.ConsumerMessageListener" />
+
+	<!-- 消息监听容器，topic模式 -->
+
+	<bean id="topicContainer"
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="consumerFactory" />
+		<property name="messageListener" ref="topicMessageListener" />
+		<property name="destination" ref="topicDestination" />
+		<!-- 开启订阅模式 -->
+        <property name="pubSubDomain" value="true"/>
+        <property name="subscriptionDurable" value="true"/>
+		<!-- 接收者ID -->
+        <property name="clientId" value="client2" />
+        <property name="receiveTimeout" value="10000"/>   
+	</bean>
+	
+	<!-- 消息监听器 -->
+	<bean id="queueMessageListener"
+		class="com.test.service.springdemo.QueueMessageListener" />
+		
+	<!-- 消息监听容器，queue模式 -->
+	<bean id="queueContainer"
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+		<property name="connectionFactory" ref="consumerFactory" />
+		<property name="messageListener" ref="queueMessageListener" />
+		<property name="destination" ref="queueDestination" />
+	</bean>
+	
+	
+	<!-- Spring提供的JMS工具类，它可以进行消息发送、接收等 -->
+	<bean id="providerFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+		<property name="brokerURL" value="failover:(tcp://172.31.25.38:61616)" />
+	</bean>
+	<bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<property name="connectionFactory" ref="providerFactory" />
+	</bean>
+</beans>

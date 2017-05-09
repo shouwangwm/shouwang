@@ -11,8 +11,5 @@ public class Test {
 		Thread c = new Consumer();
 		executor.execute(p);
 		executor.execute(c);
-		
-		
-		
 	} 
 }

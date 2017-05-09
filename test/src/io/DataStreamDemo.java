@@ -1,7 +1,11 @@
 package io;
 
 import java.io.*;
-
+/**
+ * 数据输入流和数据输出流 
+ * @author: weiming
+ * @date: 2017年2月14日
+ */
 public class DataStreamDemo {
 	public static void main(String[] args) {
 		String path = "conf/DataStreamDemo.txt";

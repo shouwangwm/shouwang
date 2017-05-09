@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+	">
+	
+	<aop:aspectj-autoproxy />
+	
+
+	<!-- <aop:config>
+		<aop:aspect id="staticHTML" ref="synchro">
+			<aop:pointcut expression="execution(* com.pro.service.impl.AdminServiceImpl.*(..))" id="synchroCut"/>
+			<aop:before method="beforeNotice" pointcut-ref="synchroCut"/>
+			<aop:after method="afterNotice" pointcut-ref="synchroCut"/>
+			<aop:after-returning method="finallyNotice" pointcut-ref="synchroCut"/>
+			<aop:after-throwing method="exceptionNotice" pointcut-ref="synchroCut"/>
+			<aop:around method="aroundNotice" pointcut-ref="synchroCut"/>
+		</aop:aspect>
+	</aop:config> -->
+
+	<bean id="synchro" class="com.pro.util.Synchro" />
+									<!-- 数据库连接池 -->																				
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="org.gjt.mm.mysql.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/test"/>
+		<property name="username" value="root"/>
+		<property name="password" value="root"/>
+		<property name="initialSize" value="1"/>
+		<property name="maxActive" value="500" />
+		<property name="maxIdle" value="10"/>
+		<property name="maxWait" value="100" />
+		<property name="minIdle" value="1"/>
+		<!-- <property name="defaultAutoCommit" value="true" /> -->
+	</bean>
+	
+	
+								<!-- SessionFactory Bean -->								
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+	
+		<!-- 将连接池注入SessionFactory Bean -->
+		<property name="dataSource" ref="dataSource" />
+		
+		<!-- hibernate.cfg.xml配置 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+		
+		<!-- 添加hbm -->
+		<property name="mappingResources">
+			<list>		
+				<value>com/pro/vo/YgAdmin.hbm.xml</value>
+				<value>com/pro/vo/TbCommodity.hbm.xml</value>
+			</list>
+		</property>
+		
+	</bean>
+
+	
+	<!-- 切面
+	<aop:config>
+		<aop:aspect id="asp" ref="powerIntercepter">
+			<aop:pointcut id="pointcut" expression="execution(* com.bms.dao.impl.*.*(..))"/>
+			<aop:before method="beforeNotice" pointcut-ref="pointcut"/>
+			<aop:after method="afterNotice" pointcut-ref="pointcut"/>
+			<aop:after-returning method="finallyNotice" pointcut-ref="pointcut"/>
+			<aop:after-throwing method="exceptionNotice" pointcut-ref="pointcut"/>
+			<aop:around method="aroundNotice" pointcut-ref="pointcut"/>
+		</aop:aspect>	
+	</aop:config>
+	 -->
+
+		<!-- Bean -->
+	<bean id="adminDao" class="com.pro.dao.impl.AdminDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<bean id="adminService" class="com.pro.service.impl.AdminServiceImpl">
+		<property name="adminDao" ref="adminDao" />
+	</bean>
+	<bean id="adminAction" class="com.pro.action.AdminAction" scope="prototype">
+		<property name="adminService" ref="adminService" />
+	</bean>
+ 	
+</beans>
+
+
+
+
+
+
+
+
+
+

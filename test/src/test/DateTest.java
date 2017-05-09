@@ -10,5 +10,9 @@ public class DateTest {
 		Long a = 1470810619000L;
 		String str = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(a));
 		System.out.println(str);
+		
+		Long de = new Date(0).getTime();
+		System.out.println(0);
 	}
+	
 }

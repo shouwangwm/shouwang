@@ -13,7 +13,7 @@ public class FileCount {
             int count=0;  //统计文件字节长度  
      InputStream streamReader = null;   //文件输入流  
      try{  
-         streamReader = new FileInputStream(new File("D:/1.jpg"));  
+         streamReader = new FileInputStream(new File("conf/token.txt"));  
          /*1.new File()里面的文件地址也可以写成D:\\David\\Java\\java 高级进阶\\files\\tiger.jpg,前一个\是用来对后一个 
           * 进行转换的，FileInputStream是有缓冲区的，所以用完之后必须关闭，否则可能导致内存占满，数据丢失。 
          */  

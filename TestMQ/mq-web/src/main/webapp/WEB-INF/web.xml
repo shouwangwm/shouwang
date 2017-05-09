@@ -1,0 +1,37 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  
+    <!--  Spring 上下文参数 -->  
+    <context-param>  
+        <param-name>contextConfigLocation</param-name>  
+        <param-value>classpath:applicationContext.xml</param-value>  
+    </context-param>  
+      
+    <!--  Spring 容器启动器 -->  
+    <listener>  
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>  
+    </listener>  
+    
+    <!--DispatcherServlet映射 -->  
+    <servlet>  
+        <servlet-name>springmvc</servlet-name>  
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>  
+        <load-on-startup>1</load-on-startup>
+        <init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/config/*servlet.xml</param-value>
+		</init-param>  
+    </servlet>  
+    <servlet-mapping>  
+        <servlet-name>springmvc</servlet-name>  
+        <url-pattern>*.html</url-pattern>  
+    </servlet-mapping>  
+    
+	<!-- 默认欢迎页面 -->
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+</web-app>

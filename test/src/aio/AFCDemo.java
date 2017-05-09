@@ -15,6 +15,8 @@ import java.util.concurrent.Future;
  * Date: 5/2/12
  * Time: 8:37 PM
  * To change this template use File | Settings | File Templates.
+ * 
+ * AsynchronousFileChannel实现的完整异步读写文件的例子
  */
 public class AFCDemo {
     static Thread current;
@@ -25,8 +27,8 @@ public class AFCDemo {
         AsynchronousFileChannel afc = AsynchronousFileChannel.open(filePath);
         ByteBuffer byteBuffer = ByteBuffer.allocate(16 * 1024);
 //使用FutureDemo时，请注释掉completionHandlerDemo，反之亦然
-//        futureDemo(afc, byteBuffer);
-        completionHandlerDemo(afc, byteBuffer);
+        futureDemo(afc, byteBuffer);
+//        completionHandlerDemo(afc, byteBuffer);
     }
 
     private static void completionHandlerDemo(AsynchronousFileChannel afc, ByteBuffer byteBuffer) throws IOException {

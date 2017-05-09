@@ -11,9 +11,9 @@ public class NumIndexMove {
 		System.out.println(1>>3); //0
 		System.out.println(1>>4); //0
 		
-		
+		//每左移一位，相当于乘以2
 		System.out.println("1<<4:" + (1<<4));
 		System.out.println("1<<5:" + (1<<5));
-		System.out.println("1<<5:" + (3<<3));
+		System.out.println("3<<3:" + (3<<3));
 	}
 }
